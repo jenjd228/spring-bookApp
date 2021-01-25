@@ -1,20 +1,18 @@
 package com.example.BookApp.Service;
 
 import com.example.BookApp.Model.Author;
-import com.example.BookApp.Model.CharAndAuthorsList;
 import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthorsService {
-    //select DISTINCT substring(fio,0,1) from authors
+
     private final Logger logger = Logger.getLogger(AuthorsService.class);
 
     private final JdbcTemplate jdbcTemplate;
@@ -23,28 +21,15 @@ public class AuthorsService {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public List<String> getOnlyChar() {
-        List<String> strings = jdbcTemplate.query("select DISTINCT substring(fio,0,1) as char from authors", (ResultSet resultSet, int rowNum) -> resultSet.getString("char"));
-        strings.sort(Comparator.comparing(Object::toString));
-        logger.info(Arrays.toString(strings.toArray()));
-        return strings;
-    }
+    public Map<String, List<Author>> getCharAndAuthorsLists() {
+        List<Author> authors = jdbcTemplate.query("select * from authors", (ResultSet resultSet, int rowNum) -> {
+            Author author = new Author();
+            author.setId(resultSet.getInt("id"));
+            author.setFio(resultSet.getString("fio"));
+            author.setBiography(resultSet.getString("biography"));
+            return author;
+        });
 
-    public List<CharAndAuthorsList> getCharAndAuthorsLists() {
-        List<CharAndAuthorsList> charAndAuthorsLists = new ArrayList<>();
-        for (String firstCharName : getOnlyChar()) {
-            String query = "select * from authors where substring(fio,0,1) ='" + firstCharName + "'";
-            List<Author> authors = jdbcTemplate.query(query, (ResultSet resultSet, int rowNum) -> {
-                Author author = new Author();
-                author.setId(resultSet.getInt("id"));
-                author.setFio(resultSet.getString("fio"));
-                author.setBiography(resultSet.getString("biography"));
-                return author;
-            });
-            charAndAuthorsLists.add(new CharAndAuthorsList(firstCharName, authors));
-        }
-        logger.info(Arrays.toString(charAndAuthorsLists.toArray()));
-        return charAndAuthorsLists;
+        return authors.stream().collect(Collectors.groupingBy(t -> t.getFio().substring(0, 1)));
     }
 }
-//"select * from authors where substring(fio,0,1) = A"

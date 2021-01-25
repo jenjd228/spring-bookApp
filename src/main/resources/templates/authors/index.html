@@ -99,12 +99,12 @@
         <div class="Section">
           <div class="Authors">
             <div class="Authors-links">
-              <a class="Authors-link" th:each="char : ${charList}" th:href="@{|#${char}|}" th:text="${char}">А</a>
+              <a class="Authors-link" th:each="char : ${charAndAuthorsMap}" th:href="@{|#${char.getKey()}|}" th:text="${char.getKey()}">А</a>
             </div>
-            <div class="Authors-block" th:each="charAndAuthors : ${charAndAuthorsList}">
-              <h2 class="Authors-title" th:id="${charAndAuthors.firstCharFio}" th:text="${charAndAuthors.firstCharFio}">
+            <div class="Authors-block" th:each="elem : ${charAndAuthorsMap}">
+              <h2 class="Authors-title" th:id="${elem.getKey()}" th:text="${elem.getKey()}">
               </h2>
-              <div class="Authors-letter" th:each="author : ${charAndAuthors.authors}">
+              <div class="Authors-letter" th:each="author : ${elem.getValue()}">
                 <div class="Authors-item"><a href="/authors/slug.html" th:text="${author.fio}" ></a>
                 </div>
               </div>

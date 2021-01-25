@@ -40,8 +40,7 @@ public class DefaultController {
     @GetMapping("/authors/index.html")
     public String authors(Model model){
         logger.info("/authors/index.html");
-        model.addAttribute("charAndAuthorsList",authorsService.getCharAndAuthorsLists());
-        model.addAttribute("charList",authorsService.getOnlyChar());
+        model.addAttribute("charAndAuthorsMap",authorsService.getCharAndAuthorsLists());
         return "authors/index";
     }
 
