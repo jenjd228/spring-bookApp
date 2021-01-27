@@ -1,4 +1,4 @@
-package com.example.BookApp.Model;
+package com.example.BookApp.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

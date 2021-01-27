@@ -1,6 +1,6 @@
 package com.example.BookApp.Service;
 
-import com.example.BookApp.Model.Book;
+import com.example.BookApp.model.Book;
 import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
