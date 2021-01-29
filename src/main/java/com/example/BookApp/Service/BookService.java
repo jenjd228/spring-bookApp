@@ -34,11 +34,11 @@ public class BookService {
 
     private void initBooksArray(){
         logger.info("books init");
-        books = jdbcTemplate.query("select * from books",(ResultSet resultSet, int rowNum)->{
+        books = jdbcTemplate.query("select * from books left join authors on books.author_id = authors.id",(ResultSet resultSet, int rowNum)->{
             Book book = new Book();
             book.setId(resultSet.getInt("id"));
             book.setTitle(resultSet.getString("title"));
-            book.setAuthor(resultSet.getString("author"));
+            book.setAuthor(resultSet.getString("fio"));
             book.setPriceOld(resultSet.getString("priceOld"));
             book.setPrice(resultSet.getString("price"));
             return book;
