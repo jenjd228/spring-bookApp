@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "spring.massages.basename",
+      "type": "java.lang.String",
+      "description": "Description for spring.massages.basename."
+  }
+] }

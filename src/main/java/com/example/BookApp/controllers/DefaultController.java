@@ -116,9 +116,15 @@ public class DefaultController {
         return "/postponed";
     }
 
+    @GetMapping("/search")
+    public String searchForm(Model model) {
+        model.addAttribute("searchForm", new SearchForm());
+        return "search/index";
+    }
+
     @PostMapping("/search")
-    public String search(@ModelAttribute("searchForm") SearchForm searchForm){
-        logger.info("/search");
+    public String search(@ModelAttribute SearchForm searchForm){
+        logger.info("/search " + searchForm.getQuery());
         return "search/index";
     }
 }
