@@ -2,6 +2,7 @@ package com.example.BookApp.controllers;
 
 import com.example.BookApp.Service.AuthorsService;
 import com.example.BookApp.Service.BookService;
+import com.example.BookApp.dto.FromToDateDTO;
 import com.example.BookApp.model.SearchForm;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -30,94 +31,96 @@ public class DefaultController {
     }
 
 
-    @RequestMapping(value = {"/", "/index.html"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
     public String init(Model model) {
-        logger.info("/index.html");
+        logger.info("/index");
         model.addAttribute("bookList", bookService.getBooks());
         return "index";
     }
 
-    @GetMapping("/genres/index.html")
+    @GetMapping("/genres/index")
     public String genres() {
-        logger.info("/genres/index.html");
+        logger.info("/genres/index");
         return "genres/index";
     }
 
-    @GetMapping("/authors/index.html")
+    @GetMapping("/authors/index")
     public String authors(Model model) {
-        logger.info("/authors/index.html");
+        logger.info("/authors/index");
         model.addAttribute("charAndAuthorsMap", authorsService.getCharAndAuthorsLists());
         return "authors/index";
     }
 
-    @GetMapping("/authors/slug.html")
+    @GetMapping("/authors/slug")
     public String slug() {
-        logger.info("/authors/slug.html");
+        logger.info("/authors/slug");
         return "authors/slug";
     }
 
-    @GetMapping("/books/recent.html")
-    public String booksRecent() {
-        logger.info("books/recent.html");
+    @GetMapping("/books/recent")
+    public String booksRecent(Model model) {
+        logger.info("/books/recent");
+        model.addAttribute("fromToDateDTO",new FromToDateDTO());
         return "books/recent";
     }
 
-    @GetMapping("/books/popular.html")
+    @GetMapping("/books/popular")
     public String booksPopular() {
-        logger.info("/books/popular.html");
+        logger.info("/books/popular");
         return "/books/popular";
     }
 
-    @GetMapping("/signin.html")
+    @GetMapping("/signin")
     public String signin() {
-        logger.info("/signin.html");
+        logger.info("/signin");
         return "/signin";
     }
 
-    @GetMapping("/cart.html")
+    @GetMapping("/cart")
     public String cart() {
-        logger.info("/cart.html");
+        logger.info("/cart");
         return "/cart";
     }
 
-    @GetMapping("/signup.html")
+    @GetMapping("/signup")
     public String signup() {
-        logger.info("/signup.html");
+        logger.info("/signup");
         return "/signup";
     }
 
-    @GetMapping("/documents/index.html")
+    @GetMapping("/documents/index")
     public String documentsIndex() {
-        logger.info("/documents/index.html");
+        logger.info("/documents/index");
         return "/documents/index";
     }
 
-    @GetMapping("/about.html")
+    @GetMapping("/about")
     public String about() {
-        logger.info("/about.html");
+        logger.info("/about");
         return "/about";
     }
 
-    @GetMapping("/faq.html")
+    @GetMapping("/faq")
     public String faq() {
-        logger.info("/faq.html");
+        logger.info("/faq");
         return "/faq";
     }
 
-    @GetMapping("/contacts.html")
+    @GetMapping("/contacts")
     public String contacts() {
-        logger.info("/contacts.html");
+        logger.info("/contacts");
         return "/contacts";
     }
 
-    @GetMapping("/postponed.html")
+    @GetMapping("/postponed")
     public String postponed() {
-        logger.info("/postponed.html");
+        logger.info("/postponed");
         return "/postponed";
     }
 
-    @GetMapping("/search")
-    public String searchForm(Model model) {
+    @GetMapping("/search/{query}")
+    public String searchForm(Model model, @PathVariable String query) {
+        System.out.println(query);
         model.addAttribute("searchForm", new SearchForm());
         return "search/index";
     }
@@ -126,5 +129,10 @@ public class DefaultController {
     public String search(@ModelAttribute SearchForm searchForm){
         logger.info("/search " + searchForm.getQuery());
         return "search/index";
+    }
+//'https://virtserver.swaggerhub.com/lunpully/bookshop/1.0.0'+address
+    @GetMapping ("/booksByTimeInterval")
+    public void booksRecentForm(@ModelAttribute FromToDateDTO fromToDateDTO){
+        System.out.println(fromToDateDTO.toString());
     }
 }
