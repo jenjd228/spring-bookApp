@@ -4,14 +4,27 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
+import java.io.Serializable;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Author {
+@Entity
+@Table(name = "author")
+public class Author implements Serializable {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String fio;
+    private String photo;
 
-    private String biography;
+    private String slug;
+
+    private String name;
+
+    @Lob
+    private String description;
+
 }
