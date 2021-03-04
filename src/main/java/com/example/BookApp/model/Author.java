@@ -20,8 +20,10 @@ public class Author implements Serializable {
 
     private String photo;
 
+    @Column(nullable = false)
     private String slug;
 
+    @Column(nullable = false)
     private String name;
 
     @Lob

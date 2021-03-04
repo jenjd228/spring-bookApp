@@ -26,10 +26,7 @@ public class AuthorsService {
     }
 
     public Map<String, List<Author>> getCharAndAuthorsLists() {
-        List<Author> authors = null;
-        System.out.println(authorRepository);
-        Optional<Author> author = authorRepository.findById(2);
-        System.out.println(author.isPresent());
+        List<Author> authors = authorRepository.findAll();
         return authors.stream().collect(Collectors.groupingBy(t -> t.getSlug().substring(0, 1)));
     }
 }

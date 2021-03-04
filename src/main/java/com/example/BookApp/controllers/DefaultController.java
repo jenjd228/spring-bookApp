@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Controller
@@ -25,6 +26,11 @@ public class DefaultController {
         this.authorsService = authorsService;
     }
 
+    @PostConstruct()
+    public void book2AuthorInit(){
+        bookService.book2AuthorInit();
+    }
+
     @ModelAttribute("searchForm")
     public SearchForm recommendedBooks(){
         return new SearchForm();
@@ -34,7 +40,7 @@ public class DefaultController {
     @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
     public String init(Model model) {
         logger.info("/index");
-        model.addAttribute("bookList", bookService.getBooks());
+        model.addAttribute("bookList", bookService.getAllBooks());
         return "index";
     }
 
