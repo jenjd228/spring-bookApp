@@ -1,7 +1,7 @@
 package com.example.BookApp.controllers;
 
-import com.example.BookApp.Service.AuthorsService;
-import com.example.BookApp.Service.BookService;
+import com.example.BookApp.service.AuthorsService;
+import com.example.BookApp.service.BookService;
 import com.example.BookApp.dto.FromToDateDTO;
 import com.example.BookApp.model.SearchForm;
 import org.apache.log4j.Logger;
@@ -10,7 +10,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
 
 @Controller
 public class DefaultController {

@@ -1,4 +1,4 @@
-package com.example.BookApp.Service;
+package com.example.BookApp.service;
 
 import com.example.BookApp.model.Book2Author;
 import com.example.BookApp.model.BookInit;

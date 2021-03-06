@@ -1,16 +1,13 @@
-package com.example.BookApp.Service;
+package com.example.BookApp.service;
 
 import com.example.BookApp.model.Author;
 import com.example.BookApp.repository.AuthorRepository;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
