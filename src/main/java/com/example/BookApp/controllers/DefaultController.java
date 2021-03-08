@@ -27,7 +27,7 @@ public class DefaultController {
 
     @PostConstruct()
     public void book2AuthorInit(){
-        bookService.book2AuthorInit();
+        //bookService.book2AuthorInit();
     }
 
     @ModelAttribute("searchForm")
