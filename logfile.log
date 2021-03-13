@@ -1,0 +1,2 @@
+2021-03-13 21:43:56 INFO  com.example.BookApp.controllers.DefaultController     - /index
+2021-03-13 21:43:56 INFO  com.example.BookApp.service.BookService     - getBooks

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="Eugene" id="1-2">
+        <createTable tableName="book">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column defaultValueNumeric="0" name="discount" type="TINYINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_bestseller" type="TINYINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pub_date" type="datetime(6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="slug" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text" type="LONGTEXT"/>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable tableName="book"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
