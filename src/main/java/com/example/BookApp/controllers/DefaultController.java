@@ -78,7 +78,7 @@ public class DefaultController {
     @ResponseBody
     public ResponseEntity getPopularBooksPage(@RequestParam("offset") Integer offset,
                                              @RequestParam("limit") Integer limit) {
-        logger.info("/books/popular");
+        logger.info("/books/popular"+offset);
         return new ResponseEntity(bookService.getPopularBooks(offset, limit),HttpStatus.OK);
     }
     /*@ModelAttribute("searchForm")
