@@ -1,12 +1,13 @@
 package com.example.BookApp.controllers;
 
+import com.example.BookApp.dto.BookDTO;
+import com.example.BookApp.dto.SearchWordDto;
 import com.example.BookApp.service.AuthorsService;
 import com.example.BookApp.service.BookService;
-import com.example.BookApp.dto.FromToDateDTO;
-import com.example.BookApp.model.SearchForm;
 import org.apache.log4j.Logger;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
@@ -28,9 +29,59 @@ public class DefaultController {
     @PostConstruct()
     public void book2AuthorInit(){
         //bookService.book2AuthorInit();
+        //bookService.bookPopularityRefresh();
     }
 
-    @ModelAttribute("searchForm")
+    @ModelAttribute("searchWordDto")
+    public SearchWordDto searchWordDto() {
+        return new SearchWordDto();
+    }
+
+    @ModelAttribute("recommendedBooks")
+    public BookDTO recommendedBooks() {
+        return bookService.getRecommendedBooks(0, 6);
+    }
+
+    @ModelAttribute("recentBooks")
+    public BookDTO recentBooks() {
+        return bookService.getNewBooks(0,6);
+    }
+
+    @ModelAttribute("popularBooks")
+    public BookDTO popularBooks() {
+        return bookService.getPopularBooks(0,6);
+    }
+
+    @GetMapping("/")
+    public String mainPage() {
+        logger.info("index");
+        return "index";
+    }
+
+    @GetMapping("/books/recommended")
+    @ResponseBody
+    public ResponseEntity getRecommendedBooksPage(@RequestParam("offset") Integer offset,
+                                                  @RequestParam("limit") Integer limit) {
+        logger.info("/books/recommended");
+        return new ResponseEntity(bookService.getRecommendedBooks(offset, limit), HttpStatus.OK);
+    }
+
+    @GetMapping("/books/recent")
+    @ResponseBody
+    public ResponseEntity getRecentBooksPage(@RequestParam("offset") Integer offset,
+                                             @RequestParam("limit") Integer limit) {
+        logger.info("/books/recent");
+        return new ResponseEntity(bookService.getNewBooks(offset, limit),HttpStatus.OK);
+    }
+
+    @GetMapping("/books/popular")
+    @ResponseBody
+    public ResponseEntity getPopularBooksPage(@RequestParam("offset") Integer offset,
+                                             @RequestParam("limit") Integer limit) {
+        logger.info("/books/popular");
+        return new ResponseEntity(bookService.getPopularBooks(offset, limit),HttpStatus.OK);
+    }
+    /*@ModelAttribute("searchForm")
     public SearchForm recommendedBooks(){
         return new SearchForm();
     }
@@ -139,5 +190,5 @@ public class DefaultController {
     @GetMapping ("/booksByTimeInterval")
     public void booksRecentForm(@ModelAttribute FromToDateDTO fromToDateDTO){
         System.out.println(fromToDateDTO.toString());
-    }
+    }*/
 }

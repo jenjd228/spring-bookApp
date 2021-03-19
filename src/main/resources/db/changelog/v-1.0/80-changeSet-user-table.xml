@@ -18,7 +18,6 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <sqlFile dbms="mysql" path="db/changelog/v-1.0/user-data.sql"/>
         <rollback>
             <dropTable tableName="user"/>
         </rollback>

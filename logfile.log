@@ -1,2 +1,3 @@
-2021-03-13 21:43:56 INFO  com.example.BookApp.controllers.DefaultController     - /index
-2021-03-13 21:43:56 INFO  com.example.BookApp.service.BookService     - getBooks
+2021-03-19 16:53:18 INFO  com.example.BookApp.controllers.DefaultController     - index
+2021-03-19 16:53:27 INFO  com.example.BookApp.controllers.DefaultController     - /books/popular
+2021-03-19 16:53:30 INFO  com.example.BookApp.controllers.DefaultController     - /books/popular

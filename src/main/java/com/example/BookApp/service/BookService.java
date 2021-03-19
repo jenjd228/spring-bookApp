@@ -1,19 +1,23 @@
 package com.example.BookApp.service;
 
+import com.example.BookApp.dto.BookDTO;
 import com.example.BookApp.model.Book2Author;
 import com.example.BookApp.model.BookInit;
-import com.example.BookApp.model.BookInitDTO;
+import com.example.BookApp.dto.BookInitDTO;
+import com.example.BookApp.model.BookPopularity;
 import com.example.BookApp.repository.AuthorRepository;
 import com.example.BookApp.repository.Book2AuthorRepository;
+import com.example.BookApp.repository.BookPopularityRepository;
 import com.example.BookApp.repository.BooksRepository;
 import org.apache.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class BookService {
@@ -29,27 +33,14 @@ public class BookService {
     @Qualifier("modelMapperToBookInitDTO")
     private final ModelMapper modelMapperToBookInitDTO;
 
-    BookService(ModelMapper modelMapperToBookInitDTO, BooksRepository booksRepository, AuthorRepository authorRepository, Book2AuthorRepository book2AuthorRepository) {
+    private final BookPopularityRepository bookPopularityRepository;
+
+    BookService(BookPopularityRepository bookPopularityRepository, ModelMapper modelMapperToBookInitDTO, BooksRepository booksRepository, AuthorRepository authorRepository, Book2AuthorRepository book2AuthorRepository) {
+        this.bookPopularityRepository = bookPopularityRepository;
         this.modelMapperToBookInitDTO = modelMapperToBookInitDTO;
         this.booksRepository = booksRepository;
         this.authorRepository = authorRepository;
         this.book2AuthorRepository = book2AuthorRepository;
-    }
-
-    public ArrayList<BookInitDTO> getAllBooks() {
-        logger.info("getBooks");
-        List<BookInit> bookInits = booksRepository.findAllBooks();
-        List<BookInitDTO> list = bookInits.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
-        return new ArrayList<>(list);
-    }
-
-    private BookInitDTO convertToDto(BookInit bookInit) {
-        if (Objects.isNull(bookInit)) {
-            return null;
-        }
-        BookInitDTO bookInitDTO = modelMapperToBookInitDTO.map(bookInit, BookInitDTO.class);
-        bookInitDTO.setPriceNewByDiscount();
-        return bookInitDTO;
     }
 
     public void book2AuthorInit() {
@@ -127,5 +118,61 @@ public class BookService {
             }
         }
         return sortIndex;
+    }
+
+    public void bookPopularityRefresh(){
+        bookPopularityRepository.deleteAll();
+
+        List<BookPopularity> list = new ArrayList<>();
+        Integer bookCount = booksRepository.getBookCount();
+        for (int i = 1;i <= bookCount;i++){
+            list.add(createBookPopularity(i));
+        }
+        bookPopularityRepository.saveAll(list);
+    }
+
+    private BookPopularity createBookPopularity(Integer bookId){
+        Double popularity = booksRepository.getBookPopularity(bookId);
+        BookPopularity bookPopularity = new BookPopularity();
+        BookPopularity.BookId2popularityKey bookId2popularityKey = new BookPopularity.BookId2popularityKey();
+        bookId2popularityKey.setBookId(bookId);
+        bookId2popularityKey.setPopularity(popularity);
+        bookPopularity.setKey(bookId2popularityKey);
+        return bookPopularity;
+    }
+
+    public ArrayList<BookInitDTO> getAllBooks() {
+        logger.info("getBooks");
+        List<BookInit> bookInits = booksRepository.findAllBooks();
+        List<BookInitDTO> list = bookInits.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        return new ArrayList<>(list);
+    }
+
+    private BookInitDTO convertToDto(BookInit bookInit) {
+        if (Objects.isNull(bookInit)) {
+            return null;
+        }
+        return modelMapperToBookInitDTO.map(bookInit, BookInitDTO.class);
+    }
+
+    public BookDTO getRecommendedBooks(Integer offset, Integer limit){
+        Pageable nextPage = PageRequest.of(offset,limit);
+        List<BookInit> bookInits = booksRepository.findAll(nextPage);
+        List<BookInitDTO> list = bookInits.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        return new BookDTO(booksRepository.getBookCount(),list);
+    }
+
+    public BookDTO getNewBooks(Integer offset, Integer limit){
+        Pageable pageable = PageRequest.of(offset , limit);
+        List<BookInit> bookInits = booksRepository.findRecentBooks(pageable);
+        List<BookInitDTO> list = bookInits.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        return new BookDTO(booksRepository.getBookCount(),list);
+    }
+
+    public BookDTO getPopularBooks(Integer offset, Integer limit){
+        Pageable pageable = PageRequest.of(offset , limit);
+        List<BookInit> bookInits = booksRepository.findPopularBooks(pageable);
+        List<BookInitDTO> list = bookInits.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        return new BookDTO(booksRepository.getBookCount(),list);
     }
 }
