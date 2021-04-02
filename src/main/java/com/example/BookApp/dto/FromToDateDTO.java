@@ -13,5 +13,4 @@ public class FromToDateDTO {
 
     private String to;
 
-
 }

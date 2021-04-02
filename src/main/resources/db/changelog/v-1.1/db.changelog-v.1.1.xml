@@ -7,4 +7,6 @@
     <include file="02-changeSet-book2user_type-onlyData.xml" relativeToChangelogFile="true"/>
     <include file="03-changeSet-book_popularity-table.xml" relativeToChangelogFile="true"/>
     <include file="04-changeSet-book2user-onlyData.xml" relativeToChangelogFile="true"/>
+    <include file="05-changeSet-genre-table.xml" relativeToChangelogFile="true"/>
+    <include file="06-changeSet-book2genre-table.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

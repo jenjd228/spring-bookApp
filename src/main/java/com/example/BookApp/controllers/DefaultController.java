@@ -1,16 +1,21 @@
 package com.example.BookApp.controllers;
 
 import com.example.BookApp.dto.BookDTO;
+import com.example.BookApp.dto.BookInitDTO;
+import com.example.BookApp.dto.FromToDateDTO;
 import com.example.BookApp.dto.SearchWordDto;
 import com.example.BookApp.service.AuthorsService;
 import com.example.BookApp.service.BookService;
+import liquibase.pro.packaged.B;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 
 @Controller
 public class DefaultController {
@@ -27,9 +32,10 @@ public class DefaultController {
     }
 
     @PostConstruct()
-    public void book2AuthorInit(){
+    public void book2AuthorInit() {
         //bookService.book2AuthorInit();
         //bookService.bookPopularityRefresh();
+        //bookService.book2GenreInit();
     }
 
     @ModelAttribute("searchWordDto")
@@ -44,54 +50,44 @@ public class DefaultController {
 
     @ModelAttribute("recentBooks")
     public BookDTO recentBooks() {
-        return bookService.getNewBooks(0,6);
+        return bookService.getRecentBooks(0, 6 ,new FromToDateDTO());
     }
 
     @ModelAttribute("popularBooks")
     public BookDTO popularBooks() {
-        return bookService.getPopularBooks(0,6);
+        return bookService.getPopularBooks(0, 6);
     }
 
-    @GetMapping("/")
+    @GetMapping(value = {"/", "index"})
     public String mainPage() {
         logger.info("index");
+
         return "index";
     }
 
     @GetMapping("/books/recommended")
     @ResponseBody
-    public ResponseEntity getRecommendedBooksPage(@RequestParam("offset") Integer offset,
-                                                  @RequestParam("limit") Integer limit) {
-        logger.info("/books/recommended");
+    public ResponseEntity getRecommendedBooksPage(@RequestParam(value = "offset" , required = false) Integer offset,
+                                                  @RequestParam(value = "limit" , required = false) Integer limit) {
+        logger.info("/books/recommended" + offset + " " + limit);
         return new ResponseEntity(bookService.getRecommendedBooks(offset, limit), HttpStatus.OK);
     }
 
-    @GetMapping("/books/recent")
-    @ResponseBody
-    public ResponseEntity getRecentBooksPage(@RequestParam("offset") Integer offset,
-                                             @RequestParam("limit") Integer limit) {
-        logger.info("/books/recent");
-        return new ResponseEntity(bookService.getNewBooks(offset, limit),HttpStatus.OK);
+    @GetMapping(value = {"/authors/index", "/authors"})
+    public String authors(Model model) {
+        logger.info("/authors/index");
+        model.addAttribute("charAndAuthorsMap", authorsService.getCharAndAuthorsLists());
+        return "authors/index";
     }
 
-    @GetMapping("/books/popular")
-    @ResponseBody
-    public ResponseEntity getPopularBooksPage(@RequestParam("offset") Integer offset,
-                                             @RequestParam("limit") Integer limit) {
-        logger.info("/books/popular"+offset);
-        return new ResponseEntity(bookService.getPopularBooks(offset, limit),HttpStatus.OK);
-    }
-    /*@ModelAttribute("searchForm")
-    public SearchForm recommendedBooks(){
-        return new SearchForm();
-    }
-
-
-    @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
-    public String init(Model model) {
-        logger.info("/index");
-        model.addAttribute("bookList", bookService.getAllBooks());
-        return "index";
+    @GetMapping("/authors/slug/{id}")
+    public String slug(@PathVariable("id") Integer id, Model model) {
+        logger.info("/authors/slug/" + id);
+        ResponseEntity r = authorsService.getAuthor(id);
+        if (r.getStatusCode().value() == 200) {
+            model.addAttribute("author", r.getBody());
+        }
+        return "authors/slug";
     }
 
     @GetMapping("/genres/index")
@@ -100,30 +96,59 @@ public class DefaultController {
         return "genres/index";
     }
 
+    @GetMapping("/books/author")
+    public String booksAuthor(Model model) {
+        logger.info("/books/author");
+        return "books/author";
+    }
+
+    @GetMapping("/books/recent")
+    public String booksRecent(@RequestParam(value = "offset" , required = false) Integer offset,
+                              @RequestParam(value = "limit" , required = false) Integer limit,
+                              @ModelAttribute FromToDateDTO fromToDateDTO,Model model) {
+        logger.info("/books/recent " + offset + " " + limit + " " + fromToDateDTO.getFrom());
+        if (offset != null && limit != null){
+            
+        }
+        return "books/recent";
+    }
+
+    @GetMapping("/books/popular")
+    public String booksPopular(@RequestParam(value = "offset" , required = false) Integer offset,
+                               @RequestParam(value = "limit" , required = false) Integer limit,Model model) {
+        logger.info("/books/popular " + offset + " " + limit);
+        if (offset != null && limit != null){
+            model.addAttribute("popularBooks",bookService.getPopularBooks(offset, limit));
+        }else {
+            model.addAttribute("popularBooks",bookService.getPopularBooks(0, 20));
+        }
+        return "/books/popular";
+    }
+
+    @GetMapping("/doks/recent")
+    public void booksRecentForm(@RequestParam("offset") Integer offset,
+                                @RequestParam("limit") Integer limit,
+                                @ModelAttribute FromToDateDTO fromToDateDTO) {
+        System.out.println(fromToDateDTO.toString());
+    }
+
+    /*@ModelAttribute("searchForm")
+    public SearchForm recommendedBooks(){
+        return new SearchForm();
+    }
+
+    @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
+    public String init(Model model) {
+        logger.info("/index");
+        model.addAttribute("bookList", bookService.getAllBooks());
+        return "index";
+    }
+
     @GetMapping("/authors/index")
     public String authors(Model model) {
         logger.info("/authors/index");
         model.addAttribute("charAndAuthorsMap", authorsService.getCharAndAuthorsLists());
         return "authors/index";
-    }
-
-    @GetMapping("/authors/slug")
-    public String slug() {
-        logger.info("/authors/slug");
-        return "authors/slug";
-    }
-
-    @GetMapping("/books/recent")
-    public String booksRecent(Model model) {
-        logger.info("/books/recent");
-        model.addAttribute("fromToDateDTO",new FromToDateDTO());
-        return "books/recent";
-    }
-
-    @GetMapping("/books/popular")
-    public String booksPopular() {
-        logger.info("/books/popular");
-        return "/books/popular";
     }
 
     @GetMapping("/signin")
