@@ -1,5 +1,7 @@
 package com.example.BookApp.config;
 
+import com.example.BookApp.model.BookIdAndRatingInterface;
+import com.example.BookApp.model.BookIdAndRating;
 import com.example.BookApp.model.BookInit;
 import com.example.BookApp.dto.BookInitDTO;
 import org.modelmapper.ModelMapper;
@@ -17,8 +19,19 @@ public class SpringConfig {
             @Override
             protected void configure() {
                 map().convertByteToBooleanIsBestseller(source.getIsBestseller());
-                map().setRating((byte) 4);
                 map().setStatus("ARCHIVED");
+            }
+        };
+        modelMapper.addMappings(propertyMap);
+        return modelMapper;
+    }
+
+    @Bean
+    public ModelMapper modelMapperToBookIdAndRating() {
+        ModelMapper modelMapper = new ModelMapper();
+        PropertyMap<BookIdAndRatingInterface, BookIdAndRating> propertyMap = new PropertyMap<>() {
+            @Override
+            protected void configure() {
             }
         };
         modelMapper.addMappings(propertyMap);

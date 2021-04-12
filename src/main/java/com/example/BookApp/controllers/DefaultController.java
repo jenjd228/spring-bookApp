@@ -36,6 +36,7 @@ public class DefaultController {
         //bookService.book2AuthorInit();
         //bookService.bookPopularityRefresh();
         //bookService.book2GenreInit();
+        //bookService.book2RatingInit();
     }
 
     @ModelAttribute("searchWordDto")
@@ -108,7 +109,7 @@ public class DefaultController {
                               @ModelAttribute FromToDateDTO fromToDateDTO,Model model) {
         logger.info("/books/recent " + offset + " " + limit + " " + fromToDateDTO.getFrom());
         if (offset != null && limit != null){
-            
+
         }
         return "books/recent";
     }

@@ -3,12 +3,8 @@ package com.example.BookApp.service;
 import com.example.BookApp.dto.BookDTO;
 import com.example.BookApp.dto.BookInitDTO;
 import com.example.BookApp.dto.FromToDateDTO;
-import com.example.BookApp.model.Book2Author;
-import com.example.BookApp.model.Book2Genre;
-import com.example.BookApp.model.BookInit;
-import com.example.BookApp.model.BookPopularity;
+import com.example.BookApp.model.*;
 import com.example.BookApp.repository.*;
-import liquibase.pro.packaged.B;
 import org.apache.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class BookService {
@@ -35,22 +30,32 @@ public class BookService {
 
     private final Book2GenreRepository book2GenreRepository;
 
-    @Qualifier("modelMapperToBookInitDTO")
-    private final ModelMapper modelMapperToBookInitDTO;
+    private final BookId2RatingRepository bookId2RatingRepository;
+
+    private final BookId2RatingValueRepository bookId2RatingValueRepository;
 
     private final BookPopularityRepository bookPopularityRepository;
 
-    BookService(Book2GenreRepository book2GenreRepository,GenreRepository genreRepository,BookPopularityRepository bookPopularityRepository, ModelMapper modelMapperToBookInitDTO, BooksRepository booksRepository, AuthorRepository authorRepository, Book2AuthorRepository book2AuthorRepository) {
+    @Qualifier("modelMapperToBookInitDTO")
+    private final ModelMapper modelMapperToBookInitDTO;
+
+    @Qualifier("modelMapperToBookIdAndRating")
+    private final ModelMapper modelMapperToBookIdAndRating;
+
+    BookService(BookId2RatingRepository bookId2RatingRepository,ModelMapper modelMapperToBookIdAndRating, BookId2RatingValueRepository bookId2RatingValueRepository, Book2GenreRepository book2GenreRepository, GenreRepository genreRepository, BookPopularityRepository bookPopularityRepository, ModelMapper modelMapperToBookInitDTO, BooksRepository booksRepository, AuthorRepository authorRepository, Book2AuthorRepository book2AuthorRepository) {
         this.book2GenreRepository = book2GenreRepository;
         this.genreRepository = genreRepository;
         this.bookPopularityRepository = bookPopularityRepository;
         this.modelMapperToBookInitDTO = modelMapperToBookInitDTO;
+        this.modelMapperToBookIdAndRating = modelMapperToBookIdAndRating;
         this.booksRepository = booksRepository;
         this.authorRepository = authorRepository;
         this.book2AuthorRepository = book2AuthorRepository;
+        this.bookId2RatingValueRepository = bookId2RatingValueRepository;
+        this.bookId2RatingRepository = bookId2RatingRepository;
     }
 
-    public void book2GenreInit(){
+    public void book2GenreInit() {
         List<Integer> booksIds = booksRepository.findAllBookIds();
         List<Integer> genresIds = genreRepository.findAllGenreIds();
         List<Book2Genre> book2Genres = new ArrayList<>();
@@ -71,17 +76,32 @@ public class BookService {
             }
         }
 
-        for (int i = 0;i<20;i++){
+        for (int i = 0; i < 20; i++) {
             Book2Genre book2Genre = new Book2Genre();
             Book2Genre.BookId2genreKey bookId2genreKey = new Book2Genre.BookId2genreKey();
             Integer bookId = getRandomBookId(booksIds);
             bookId2genreKey.setBookId(bookId);
-            bookId2genreKey.setGenreId(getRandomUnmatchedGenreId(bookId,genresIds,book2Genres));
+            bookId2genreKey.setGenreId(getRandomUnmatchedGenreId(bookId, genresIds, book2Genres));
             book2Genre.setKey(bookId2genreKey);
             book2Genres.add(book2Genre);
         }
 
         book2GenreRepository.saveAll(book2Genres);
+    }
+
+    public void book2RatingInit() {
+        List<BookIdAndRatingInterface> bookIdAndRatings = bookId2RatingValueRepository.getBookIdAndRating();
+        List<BookIdAndRating> list = bookIdAndRatings.stream().map(this::convertToBookIdAndRating).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        for (BookIdAndRating bookIdAndRating : list){
+            BookId2Rating bookId2Rating = new BookId2Rating();
+            bookId2Rating.setBookId(bookIdAndRating.getBookId());
+            if (bookIdAndRating.getRating() == null){
+                bookId2Rating.setValue((byte) 0);
+            }else {
+                bookId2Rating.setValue(bookIdAndRating.getRating());
+            }
+            bookId2RatingRepository.save(bookId2Rating);
+        }
     }
 
     private Integer getRandomUnmatchedGenreId(Integer bookId, List<Integer> genresIds, List<Book2Genre> book2Genres) {
@@ -212,13 +232,6 @@ public class BookService {
         return new ArrayList<>(list);
     }
 
-    private BookInitDTO convertToDto(BookInit bookInit) {
-        if (Objects.isNull(bookInit)) {
-            return null;
-        }
-        return modelMapperToBookInitDTO.map(bookInit, BookInitDTO.class);
-    }
-
     public BookDTO getRecommendedBooks(Integer offset, Integer limit) {
         Pageable pageable = PageRequest.of(offset, limit);
         List<BookInit> bookInits = booksRepository.findAll(pageable);
@@ -262,8 +275,16 @@ public class BookService {
 
     public BookDTO getBooksByGenreId(Integer offset, Integer limit, Integer genreId) {
         Pageable pageable = PageRequest.of(offset, limit);
-        List<BookInit> bookInits = booksRepository.findBooksByGenreId(pageable,genreId);
+        List<BookInit> bookInits = booksRepository.findBooksByGenreId(pageable, genreId);
         List<BookInitDTO> list = bookInits.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
         return new BookDTO(booksRepository.getCountBooksByGenreId(genreId), list);
+    }
+
+    private BookInitDTO convertToDto(BookInit bookInit) {
+        return bookInit == null ? null : modelMapperToBookInitDTO.map(bookInit, BookInitDTO.class);
+    }
+
+    private BookIdAndRating convertToBookIdAndRating(BookIdAndRatingInterface bookIdAndRatingInterface) {
+        return bookIdAndRatingInterface == null ? null : modelMapperToBookIdAndRating.map(bookIdAndRatingInterface, BookIdAndRating.class);
     }
 }
