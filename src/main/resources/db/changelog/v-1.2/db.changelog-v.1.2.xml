@@ -6,4 +6,8 @@
     <include file="01-changeSet-bookId2rating_value-table.xml" relativeToChangelogFile="true"/>
     <include file="02-changeSet-bookId2rating-table.xml" relativeToChangelogFile="true"/>
     <include file="03-changeSet-bookId2rating_value-onlyData.xml" relativeToChangelogFile="true"/>
+    <include file="04-changeSet-tag-table.xml" relativeToChangelogFile="true"/>
+    <include file="05-changeSet-tag2book-table.xml" relativeToChangelogFile="true"/>
+    <include file="06-changeSet-tag-onlyData.xml" relativeToChangelogFile="true"/>
+    <include file="07-changeSet-tag2book-onlyData.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

@@ -4,10 +4,14 @@ import com.example.BookApp.dto.BookDTO;
 import com.example.BookApp.dto.BookInitDTO;
 import com.example.BookApp.dto.FromToDateDTO;
 import com.example.BookApp.dto.SearchWordDto;
+import com.example.BookApp.model.OnlyTagName;
+import com.example.BookApp.repository.TagRepository;
 import com.example.BookApp.service.AuthorsService;
 import com.example.BookApp.service.BookService;
+import com.example.BookApp.service.DefaultService;
 import liquibase.pro.packaged.B;
 import org.apache.log4j.Logger;
+import org.dom4j.rule.Mode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -26,17 +30,22 @@ public class DefaultController {
 
     public final AuthorsService authorsService;
 
-    DefaultController(BookService bookService, AuthorsService authorsService) {
+    private final DefaultService defaultService;
+
+
+    DefaultController(DefaultService defaultService,BookService bookService, AuthorsService authorsService) {
         this.bookService = bookService;
         this.authorsService = authorsService;
+        this.defaultService = defaultService;
     }
 
     @PostConstruct()
     public void book2AuthorInit() {
-        //bookService.book2AuthorInit();
-        //bookService.bookPopularityRefresh();
-        //bookService.book2GenreInit();
-        //bookService.book2RatingInit();
+        /*bookService.book2AuthorInit();
+        bookService.bookPopularityRefresh();
+        bookService.book2GenreInit();
+        bookService.book2RatingInit();*/
+        System.out.println(defaultService.getBooksGenreLikeTreeMap().toString());
     }
 
     @ModelAttribute("searchWordDto")
@@ -60,9 +69,9 @@ public class DefaultController {
     }
 
     @GetMapping(value = {"/", "index"})
-    public String mainPage() {
+    public String mainPage(Model model) {
         logger.info("index");
-
+        model.addAttribute("tags",defaultService.getAllTags());
         return "index";
     }
 
@@ -92,9 +101,16 @@ public class DefaultController {
     }
 
     @GetMapping("/genres/index")
-    public String genres() {
+    public String genres(Model model) {
         logger.info("/genres/index");
+        model.addAttribute("treeMapOfGenres",defaultService.getBooksGenreLikeTreeMap());
         return "genres/index";
+    }
+
+    @GetMapping("/genres/slug")
+    public String genresSlug() {
+        logger.info("/genres/slug");
+        return "genres/slug";
     }
 
     @GetMapping("/books/author")
@@ -126,11 +142,19 @@ public class DefaultController {
         return "/books/popular";
     }
 
-    @GetMapping("/doks/recent")
+    /*@GetMapping("/doks/recent")
     public void booksRecentForm(@RequestParam("offset") Integer offset,
                                 @RequestParam("limit") Integer limit,
                                 @ModelAttribute FromToDateDTO fromToDateDTO) {
         System.out.println(fromToDateDTO.toString());
+    }*/
+
+    @GetMapping("/tags/index/{id}")
+    public String booksTags(@PathVariable("id") Integer tagId,Model model) {
+        logger.info("/tags/index " + tagId);
+        model.addAttribute("tagName",new OnlyTagName(defaultService.getTagNameByTagId(tagId)));
+        model.addAttribute("booksByTag",bookService.getBookByTagId(0,20,tagId));
+        return "/tags/index";
     }
 
     /*@ModelAttribute("searchForm")

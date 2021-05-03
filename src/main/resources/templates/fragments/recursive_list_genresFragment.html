@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="recursiveListGenresFragmentWithParent">
+    <div class="Tags">
+        <div class="Tags-title">
+            <div class="Tag">
+                <a href="/genres/slug" th:text="${parent.name} + '(' + ${parent.bookCount} + ')'">Детективы</a>
+            </div>
+        </div>
+        <th:block th:each="listItem : ${listItems}">
+            <th:block th:if="${listItem.list!=null}">
+                <th:block
+                        th:include="~{fragments/recursive_list_genresFragment :: recursiveListGenresFragmentWithParent}"
+                        th:with="listItems=${listItem.list},parent=${listItem}"></th:block>
+            </th:block>
+
+            <div class="Tag" th:if="${listItem.list==null}">
+                <a href="/genres/slug" th:text="${listItem.name} + '(' + ${listItem.bookCount} + ')'">Детективы</a>
+            </div>
+
+        </th:block>
+    </div>
+</div>
+
+
+</body>
+</html>

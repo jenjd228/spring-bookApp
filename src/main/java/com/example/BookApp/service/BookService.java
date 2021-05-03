@@ -76,7 +76,7 @@ public class BookService {
             }
         }
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 22; i++) {
             Book2Genre book2Genre = new Book2Genre();
             Book2Genre.BookId2genreKey bookId2genreKey = new Book2Genre.BookId2genreKey();
             Integer bookId = getRandomBookId(booksIds);
@@ -227,57 +227,64 @@ public class BookService {
 
     public ArrayList<BookInitDTO> getAllBooks() {
         logger.info("getBooks");
-        List<BookInit> bookInits = booksRepository.findAllBooks();
-        List<BookInitDTO> list = bookInits.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        List<BookInit> booksInit = booksRepository.findAllBooks();
+        List<BookInitDTO> list = booksInit.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
         return new ArrayList<>(list);
     }
 
     public BookDTO getRecommendedBooks(Integer offset, Integer limit) {
         Pageable pageable = PageRequest.of(offset, limit);
-        List<BookInit> bookInits = booksRepository.findAll(pageable);
-        List<BookInitDTO> list = bookInits.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        List<BookInit> booksInit = booksRepository.findAll(pageable);
+        List<BookInitDTO> list = booksInit.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
         return new BookDTO(booksRepository.getBookCount(), list);
     }
 
     public BookDTO getRecentBooks(Integer offset, Integer limit, FromToDateDTO fromToDateDTO) {
         Pageable pageable = PageRequest.of(offset, limit);
-        List<BookInit> bookInits;
+        List<BookInit> booksInit;
         Integer bookCount = 0;
 
         if (fromToDateDTO.getFrom() == null && fromToDateDTO.getTo() == null) {
-            bookInits = booksRepository.findRecentBooks(pageable);
+            booksInit = booksRepository.findRecentBooks(pageable);
             bookCount = booksRepository.getBookCount();
         } else if (fromToDateDTO.getFrom() == null) {
-            bookInits = booksRepository.findRecentBooksWhereToIsNotNull(pageable, fromToDateDTO.getTo());
+            booksInit = booksRepository.findRecentBooksWhereToIsNotNull(pageable, fromToDateDTO.getTo());
             bookCount = booksRepository.getCountRecentBooksWhereToIsNotNull(fromToDateDTO.getTo());
         } else {
-            bookInits = booksRepository.findRecentBooksWhereFromIsNotNull(pageable, fromToDateDTO.getFrom());
+            booksInit = booksRepository.findRecentBooksWhereFromIsNotNull(pageable, fromToDateDTO.getFrom());
             bookCount = booksRepository.getCountRecentBooksWhereFromIsNotNull(fromToDateDTO.getFrom());
         }
 
-        List<BookInitDTO> list = bookInits.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        List<BookInitDTO> list = booksInit.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
         return new BookDTO(bookCount, list);
     }
 
     public BookDTO getPopularBooks(Integer offset, Integer limit) {
         Pageable pageable = PageRequest.of(offset, limit);
-        List<BookInit> bookInits = booksRepository.findPopularBooks(pageable);
-        List<BookInitDTO> list = bookInits.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        List<BookInit> booksInit = booksRepository.findPopularBooks(pageable);
+        List<BookInitDTO> list = booksInit.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
         return new BookDTO(booksRepository.getBookCount(), list);
     }
 
     public BookDTO getBooksByAuthorId(Integer offset, Integer limit, Integer id) {
         Pageable pageable = PageRequest.of(offset, limit);
-        List<BookInit> bookInits = booksRepository.findBooksByAuthorId(pageable, id);
-        List<BookInitDTO> list = bookInits.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        List<BookInit> booksInit = booksRepository.findBooksByAuthorId(pageable, id);
+        List<BookInitDTO> list = booksInit.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
         return new BookDTO(booksRepository.getCountBooksByAuthorId(id), list);
     }
 
     public BookDTO getBooksByGenreId(Integer offset, Integer limit, Integer genreId) {
         Pageable pageable = PageRequest.of(offset, limit);
-        List<BookInit> bookInits = booksRepository.findBooksByGenreId(pageable, genreId);
-        List<BookInitDTO> list = bookInits.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        List<BookInit> booksInit = booksRepository.findBooksByGenreId(pageable, genreId);
+        List<BookInitDTO> list = booksInit.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
         return new BookDTO(booksRepository.getCountBooksByGenreId(genreId), list);
+    }
+
+    public BookDTO getBookByTagId(Integer offset, Integer limit,Integer tagId){
+        Pageable pageable = PageRequest.of(offset, limit);
+        List<BookInit> booksInit = booksRepository.findBooksByTagId(pageable, tagId);
+        List<BookInitDTO> list = booksInit.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        return new BookDTO(booksRepository.getCountBooksByTagId(tagId), list);
     }
 
     private BookInitDTO convertToDto(BookInit bookInit) {

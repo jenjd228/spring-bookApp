@@ -18,3 +18,8 @@ insert into genre (id, parent_id, slug, name) values (17, null, 'Nicardipine HCl
 insert into genre (id, parent_id, slug, name) values (18, null, 'Olay Total Effects Pore Minimizing CC', 'Homosalate, Octisalate, and Octocrylene');
 insert into genre (id, parent_id, slug, name) values (19, null, 'Ibuprofen', 'Ibuprofen');
 insert into genre (id, parent_id, slug, name) values (20, null, 'JUGLANS NIGRA POLLEN', 'California Walnut Black Pollen');
+
+insert into genre (id, parent_id, slug, name) values (21, 1, 'JUGLANS NIGRA POLLEN (child1)', 'California Walnut Black Pollen (child)1');
+insert into genre (id, parent_id, slug, name) values (22, 21, 'JUGLANS NIGRA POLLEN (child (child)1)', 'California Walnut Black Pollen (child)2');
+insert into genre (id, parent_id, slug, name) values (23, 2, 'JUGLANS NIGRA POLLEN (child2)', 'California Walnut Black Pollen (child)3');
+insert into genre (id, parent_id, slug, name) values (24, 1, 'JUGLANS NIGRA POLLEN (child3)', 'California Walnut Black Pollen (child)4');

@@ -96,4 +96,20 @@ public interface BooksRepository extends CrudRepository<Book, Integer> {
             "join book2genre bg on b.id = bg.book_id where bg.genre_id = :genreId " +
             "order by b.pub_date desc) as count ", nativeQuery = true)
     Integer getCountBooksByGenreId(@Param("genreId") Integer genreId);
+
+    @Query(value = "select b.id as id,b.slug,title,image,(select value from book_id2rating where book_id = b.id)as rating," +
+            "(select authors from (select group_concat(a.name) as authors,b.id as bId from book2author ba join author a on a.id = ba.author_id join book b on b.id = ba.book_id group by book_id) as t where t.bId = b.id) as authors,discount,is_bestseller as isBestseller,price, round(price - (price * discount/100)) as discountPrice " +
+            "from book b left join author a on b.id = a.id " +
+            "left join tag2book tb on b.id = tb.book_id " +
+            "left join tag t on tb.book_id = t.id where  tb.tag_id = :tagId " +
+            "order by b.pub_date desc ",nativeQuery = true)
+    List<BookInit> findBooksByTagId(Pageable pageable,@Param("tagId") Integer tagId);
+
+    @Query(value = "select count(*) as count from (select b.id as id,b.slug,title,image,(select value from book_id2rating where book_id = b.id)as rating," +
+            "(select authors from (select group_concat(a.name) as authors,b.id as bId from book2author ba join author a on a.id = ba.author_id join book b on b.id = ba.book_id group by book_id) as t where t.bId = b.id) as authors,discount,is_bestseller as isBestseller,price, round(price - (price * discount/100)) as discountPrice " +
+            "from book b left join author a on b.id = a.id " +
+            "left join tag2book tb on b.id = tb.book_id " +
+            "left join tag t on tb.book_id = t.id where  tb.tag_id = :tagId " +
+            "order by b.pub_date desc) as count ",nativeQuery = true)
+    Integer getCountBooksByTagId(@Param("tagId") Integer tagId);
 }

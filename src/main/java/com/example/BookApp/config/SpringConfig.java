@@ -1,8 +1,6 @@
 package com.example.BookApp.config;
 
-import com.example.BookApp.model.BookIdAndRatingInterface;
-import com.example.BookApp.model.BookIdAndRating;
-import com.example.BookApp.model.BookInit;
+import com.example.BookApp.model.*;
 import com.example.BookApp.dto.BookInitDTO;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
@@ -30,6 +28,18 @@ public class SpringConfig {
     public ModelMapper modelMapperToBookIdAndRating() {
         ModelMapper modelMapper = new ModelMapper();
         PropertyMap<BookIdAndRatingInterface, BookIdAndRating> propertyMap = new PropertyMap<>() {
+            @Override
+            protected void configure() {
+            }
+        };
+        modelMapper.addMappings(propertyMap);
+        return modelMapper;
+    }
+
+    @Bean
+    public ModelMapper modelMapperToBook2Genre() {
+        ModelMapper modelMapper = new ModelMapper();
+        PropertyMap<Book2GenreWithCountInterface, Book2GenreWithCount> propertyMap = new PropertyMap<>() {
             @Override
             protected void configure() {
             }

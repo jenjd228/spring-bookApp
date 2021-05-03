@@ -11,22 +11,20 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "book_popularity")
-public class BookPopularity implements Serializable {
+@Table(name = "tag2book")
+public class Tag2Book {
 
     @EmbeddedId
-    private BookId2popularityKey key;
+    private BookId2TagId key;
 
     @Embeddable
     @Data
-    public static class BookId2popularityKey implements Serializable {
+    public static class BookId2TagId implements Serializable {
 
-        @Column(name = "book_id", nullable = false)
+        @Column(name = "book_id",nullable = false)
         private Integer bookId;
 
-        @Column(nullable = false)
-        private Double popularity;
+        @Column(name = "tag_id",nullable = false)
+        private Integer tagID;
     }
-
-
 }
