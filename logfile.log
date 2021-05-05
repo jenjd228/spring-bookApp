@@ -1,9 +1,9 @@
-2021-05-03 19:31:32 INFO  com.example.BookApp.controllers.DefaultController     - index
-2021-05-03 19:31:37 INFO  com.example.BookApp.controllers.DefaultController     - index
-2021-05-03 19:31:43 INFO  com.example.BookApp.controllers.DefaultController     - /books/recommended0 6
-2021-05-03 19:31:43 INFO  com.example.BookApp.controllers.DefaultController     - /books/recent 0 6 null
-2021-05-03 19:31:43 INFO  com.example.BookApp.controllers.DefaultController     - /books/popular 1 6
-2021-05-03 19:31:59 INFO  com.example.BookApp.controllers.DefaultController     - index
-2021-05-03 19:38:38 INFO  com.example.BookApp.controllers.DefaultController     - index
-2021-05-03 19:38:53 INFO  com.example.BookApp.controllers.DefaultController     - /genres/index
-2021-05-03 19:39:02 INFO  com.example.BookApp.controllers.DefaultController     - /genres/slug
+2021-05-05 09:24:17 INFO  com.example.BookApp.controllers.DefaultController     - /search/{searchWord} SearchWordDto(example=It)
+2021-05-05 09:24:23 INFO  com.example.BookApp.controllers.DefaultController     - /search/{searchWord} SearchWordDto(example=Техника)
+2021-05-05 09:24:32 INFO  com.example.BookApp.controllers.DefaultController     - index
+2021-05-05 09:25:16 INFO  com.example.BookApp.controllers.DefaultController     - /authors/index
+2021-05-05 09:25:18 INFO  com.example.BookApp.controllers.DefaultController     - /authors/slug/39
+2021-05-05 09:25:29 INFO  com.example.BookApp.controllers.DefaultController     - /books/author
+2021-05-05 09:25:35 INFO  com.example.BookApp.controllers.DefaultController     - /genres/index
+2021-05-05 09:25:37 INFO  com.example.BookApp.controllers.DefaultController     - /genres/slug
+2021-05-05 09:26:15 INFO  com.example.BookApp.controllers.DefaultController     - /genres/slug

@@ -287,6 +287,12 @@ public class BookService {
         return new BookDTO(booksRepository.getCountBooksByTagId(tagId), list);
     }
 
+    public BookDTO getBooksByQuery(String query) {
+        List<BookInit> booksInit = booksRepository.getBooksByTitleContaining(query);
+        List<BookInitDTO> list = booksInit.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        return new BookDTO(list.size(), list);
+    }
+
     private BookInitDTO convertToDto(BookInit bookInit) {
         return bookInit == null ? null : modelMapperToBookInitDTO.map(bookInit, BookInitDTO.class);
     }
@@ -294,4 +300,5 @@ public class BookService {
     private BookIdAndRating convertToBookIdAndRating(BookIdAndRatingInterface bookIdAndRatingInterface) {
         return bookIdAndRatingInterface == null ? null : modelMapperToBookIdAndRating.map(bookIdAndRatingInterface, BookIdAndRating.class);
     }
+
 }

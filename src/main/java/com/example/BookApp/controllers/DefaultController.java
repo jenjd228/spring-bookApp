@@ -5,6 +5,7 @@ import com.example.BookApp.dto.BookInitDTO;
 import com.example.BookApp.dto.FromToDateDTO;
 import com.example.BookApp.dto.SearchWordDto;
 import com.example.BookApp.model.OnlyTagName;
+import com.example.BookApp.model.SearchForm;
 import com.example.BookApp.repository.TagRepository;
 import com.example.BookApp.service.AuthorsService;
 import com.example.BookApp.service.BookService;
@@ -124,9 +125,6 @@ public class DefaultController {
                               @RequestParam(value = "limit" , required = false) Integer limit,
                               @ModelAttribute FromToDateDTO fromToDateDTO,Model model) {
         logger.info("/books/recent " + offset + " " + limit + " " + fromToDateDTO.getFrom());
-        if (offset != null && limit != null){
-
-        }
         return "books/recent";
     }
 
@@ -155,6 +153,14 @@ public class DefaultController {
         model.addAttribute("tagName",new OnlyTagName(defaultService.getTagNameByTagId(tagId)));
         model.addAttribute("booksByTag",bookService.getBookByTagId(0,20,tagId));
         return "/tags/index";
+    }
+
+    @GetMapping("/search/{searchWord}")
+    public String searchForm(Model model, @PathVariable(value = "searchWord",required = false) SearchWordDto searchWordDto) {
+        logger.info("/search/{searchWord} " + searchWordDto);
+        model.addAttribute("searchWordDTO", searchWordDto);
+        model.addAttribute("searchResults", bookService.getBooksByQuery(searchWordDto.getExample()));
+        return "search/index";
     }
 
     /*@ModelAttribute("searchForm")
