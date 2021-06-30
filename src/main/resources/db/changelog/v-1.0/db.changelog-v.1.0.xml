@@ -8,10 +8,10 @@
     <include file="30-changeSet-book2author-table.xml" relativeToChangelogFile="true"/>
     <include file="40-changeSet-book2user-table.xml" relativeToChangelogFile="true"/>
     <include file="50-changeSet-book2user_type-table.xml" relativeToChangelogFile="true"/>
-    <include file="60-changeSet-book_review-table.xml" relativeToChangelogFile="true"/>
     <include file="70-changeSet-book_review_like-table.xml" relativeToChangelogFile="true"/>
     <include file="80-changeSet-user-table.xml" relativeToChangelogFile="true"/>
+    <include file="60-changeSet-book_review-table.xml" relativeToChangelogFile="true"/>
     <include file="90-changeSet-user_contact-table.xml" relativeToChangelogFile="true"/>
 
-
+    <include file="11-changeSet-book_review_like-onlyData.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

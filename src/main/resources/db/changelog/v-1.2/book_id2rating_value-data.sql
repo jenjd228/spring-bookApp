@@ -32,7 +32,7 @@ insert into book_id2rating_value (id, user_id, book_id, value) values (31, 43, 1
 insert into book_id2rating_value (id, user_id, book_id, value) values (32, 34, 20, 5);
 insert into book_id2rating_value (id, user_id, book_id, value) values (33, 43, 30, 4);
 insert into book_id2rating_value (id, user_id, book_id, value) values (34, 36, 1, 5);
-insert into book_id2rating_value (id, user_id, book_id, value) values (35, 47, 50, 3);
+insert into book_id2rating_value (id, user_id, book_id, value) values (35, 47, 49, 3);
 insert into book_id2rating_value (id, user_id, book_id, value) values (36, 42, 29, 1);
 insert into book_id2rating_value (id, user_id, book_id, value) values (37, 37, 4, 2);
 insert into book_id2rating_value (id, user_id, book_id, value) values (38, 47, 50, 5);

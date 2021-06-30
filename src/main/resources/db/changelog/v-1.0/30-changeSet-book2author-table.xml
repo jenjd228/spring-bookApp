@@ -17,6 +17,16 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <addForeignKeyConstraint baseTableName="book2author"
+                                 baseColumnNames="author_id"
+                                 constraintName="book2authorAuthorConstraint"
+                                 referencedTableName="author"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="book2author"
+                                 baseColumnNames="book_id"
+                                 constraintName="book2authorBookConstraint"
+                                 referencedTableName="book"
+                                 referencedColumnNames="id"/>
         <rollback>
             <dropTable tableName="book2author"/>
         </rollback>

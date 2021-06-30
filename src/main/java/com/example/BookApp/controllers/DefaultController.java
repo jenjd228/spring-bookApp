@@ -4,12 +4,17 @@ import com.example.BookApp.dto.BookDTO;
 import com.example.BookApp.dto.BookInitDTO;
 import com.example.BookApp.dto.FromToDateDTO;
 import com.example.BookApp.dto.SearchWordDto;
+import com.example.BookApp.model.Book;
+import com.example.BookApp.model.BookReview;
 import com.example.BookApp.model.OnlyTagName;
 import com.example.BookApp.model.SearchForm;
+import com.example.BookApp.repository.BookId2RatingValueRepository;
+import com.example.BookApp.repository.BooksRepository;
 import com.example.BookApp.repository.TagRepository;
 import com.example.BookApp.service.AuthorsService;
 import com.example.BookApp.service.BookService;
 import com.example.BookApp.service.DefaultService;
+import com.example.BookApp.service.UserService;
 import liquibase.pro.packaged.B;
 import org.apache.log4j.Logger;
 import org.dom4j.rule.Mode;
@@ -18,9 +23,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Controller
 public class DefaultController {
@@ -33,11 +41,16 @@ public class DefaultController {
 
     private final DefaultService defaultService;
 
+    private final BooksRepository booksRepository;
 
-    DefaultController(DefaultService defaultService,BookService bookService, AuthorsService authorsService) {
+    private final BookId2RatingValueRepository bookId2RatingValueRepository;
+
+    DefaultController(BookId2RatingValueRepository bookId2RatingValueRepository,BooksRepository booksRepository,DefaultService defaultService, BookService bookService, AuthorsService authorsService) {
         this.bookService = bookService;
+        this.booksRepository = booksRepository;
         this.authorsService = authorsService;
         this.defaultService = defaultService;
+        this.bookId2RatingValueRepository = bookId2RatingValueRepository;
     }
 
     @PostConstruct()
@@ -46,7 +59,8 @@ public class DefaultController {
         bookService.bookPopularityRefresh();
         bookService.book2GenreInit();
         bookService.book2RatingInit();*/
-        System.out.println(defaultService.getBooksGenreLikeTreeMap().toString());
+        //System.out.println(defaultService.getBooksGenreLikeTreeMap().toString());
+        //System.out.println(booksRepository.findById(1).get().getComments().get(3).getUser().getId());
     }
 
     @ModelAttribute("searchWordDto")
@@ -72,6 +86,7 @@ public class DefaultController {
     @GetMapping(value = {"/", "index"})
     public String mainPage(Model model) {
         logger.info("index");
+        //System.out.println(RequestContextHolder.currentRequestAttributes().getSessionId());
         model.addAttribute("tags",defaultService.getAllTags());
         return "index";
     }
@@ -140,13 +155,6 @@ public class DefaultController {
         return "/books/popular";
     }
 
-    /*@GetMapping("/doks/recent")
-    public void booksRecentForm(@RequestParam("offset") Integer offset,
-                                @RequestParam("limit") Integer limit,
-                                @ModelAttribute FromToDateDTO fromToDateDTO) {
-        System.out.println(fromToDateDTO.toString());
-    }*/
-
     @GetMapping("/tags/index/{id}")
     public String booksTags(@PathVariable("id") Integer tagId,Model model) {
         logger.info("/tags/index " + tagId);
@@ -163,10 +171,34 @@ public class DefaultController {
         return "search/index";
     }
 
-    /*@ModelAttribute("searchForm")
-    public SearchForm recommendedBooks(){
-        return new SearchForm();
+    @GetMapping("/books/slug/{id}")
+    public String booksSlug(@PathVariable("id") Integer bookId,Model model) {
+        logger.info("/books/slug/" + bookId);
+        model.addAttribute("bookSlugDTO",bookService.getBookSlugById(bookId));
+        return "books/slug";
     }
+
+    @GetMapping("/signin")
+    public String signin() {
+        logger.info("/signin");
+        return "/signin";
+    }
+
+    @GetMapping("/signup")
+    public String signup() {
+        logger.info("/signup");
+        return "/signup";
+    }
+
+    @GetMapping("/postponed")
+    public String postponed(Model model) {
+        logger.info("/postponed");
+        model.addAttribute("postponedBooksAndIdsDTO",bookService.getPostponedBooks(1));
+        return "/postponed";
+    }
+
+
+    /*
 
     @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
     public String init(Model model) {
@@ -182,22 +214,10 @@ public class DefaultController {
         return "authors/index";
     }
 
-    @GetMapping("/signin")
-    public String signin() {
-        logger.info("/signin");
-        return "/signin";
-    }
-
     @GetMapping("/cart")
     public String cart() {
         logger.info("/cart");
         return "/cart";
-    }
-
-    @GetMapping("/signup")
-    public String signup() {
-        logger.info("/signup");
-        return "/signup";
     }
 
     @GetMapping("/documents/index")

@@ -2,6 +2,7 @@ package com.example.BookApp.repository;
 
 import com.example.BookApp.model.Book;
 import com.example.BookApp.model.BookInit;
+import com.example.BookApp.model.BookSlug;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -9,9 +10,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BooksRepository extends CrudRepository<Book, Integer> {
+
+    @Override
+    Optional<Book> findById(Integer integer);
 
     @Query(value = "select book.id as id,slug,title,image,name,price,discount from book left join author on book.id = author.id", nativeQuery = true)
     List<BookInit> findAllBooks();
@@ -119,5 +124,17 @@ public interface BooksRepository extends CrudRepository<Book, Integer> {
             "left join tag2book tb on b.id = tb.book_id " +
             "left join tag t on tb.book_id = t.id where  b.title like %:query% " +
             "order by b.pub_date desc;" ,nativeQuery = true)
-    List<BookInit> getBooksByTitleContaining(@Param("query") String query);
+    List<BookInit> findBooksByTitleContaining(@Param("query") String query);
+
+    @Query(value = "select distinct b.id AS id,b.slug,title,image,description,(select value from book_id2rating where book_id = b.id)as rating, " +
+            "(select authors from (select GROUP_CONCAT(a.name) as authors,b.id as bId from book2author ba " +
+            "           join author a on a.id = ba.author_id " +
+            "           join book b on b.id = ba.book_id group by book_id) AS t where t.bId = b.id) as authors, " +
+            "(select tags from (select GROUP_CONCAT(t.name) as tags,tb.book_id " +
+            "           from tag2book tb " +
+            "           join tag t on tb.tag_id = t.id group by tb.book_id) AS t where t.book_id = :bookId) as tags " +
+            ",discount,is_bestseller as isBestseller,price, round(price - (price * discount/100)) as discountPrice from book b " +
+            "           join tag2book tb on b.id = tb.book_id " +
+            "           join tag t on tb.tag_id = t.id where b.id = :bookId ",nativeQuery = true)
+    BookSlug findBookSlugById(@Param("bookId") Integer bookId);
 }

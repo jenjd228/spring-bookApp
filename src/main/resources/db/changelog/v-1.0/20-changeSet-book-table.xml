@@ -16,7 +16,7 @@
             <column name="is_bestseller" type="TINYINT">
                 <constraints nullable="false"/>
             </column>
-            <column name="price" type="VARCHAR(255)">
+            <column name="price" type="DECIMAL">
                 <constraints nullable="false"/>
             </column>
             <column name="pub_date" type="datetime(6)">
@@ -25,7 +25,7 @@
             <column name="slug" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="text" type="LONGTEXT"/>
+            <column name="description" type="LONGTEXT"/>
             <column name="title" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>

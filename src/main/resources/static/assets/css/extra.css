@@ -1408,7 +1408,6 @@
 .Comment-rating {
   display: inline-block;
   vertical-align: middle;
-  margin-left: 20px;
 }
 @media screen and (max-width: 480px) {
   .Comment-rating {

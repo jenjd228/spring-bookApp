@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="Eugene" id="1-11">
+        <sqlFile dbms="mysql" path="db/changelog/v-1.0/book_review_like-data.sql"/>
+        <rollback>
+            DELETE * FROM book_review_like;
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

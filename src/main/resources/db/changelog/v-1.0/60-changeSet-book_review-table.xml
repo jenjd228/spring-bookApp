@@ -20,6 +20,16 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <addForeignKeyConstraint baseTableName="book_review"
+                                 baseColumnNames="book_id"
+                                 constraintName="book_reviewBookConstraint"
+                                 referencedTableName="book"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="book_review"
+                                 baseColumnNames="user_id"
+                                 constraintName="book_reviewUserConstraint"
+                                 referencedTableName="user"
+                                 referencedColumnNames="id"/>
         <rollback>
             <dropTable tableName="book_review"/>
         </rollback>

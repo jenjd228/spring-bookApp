@@ -21,7 +21,7 @@ public class User implements Serializable {
     @Column(nullable = false)
     private String hash;
 
-    @Column(nullable = false,name = "reg_time")
+    @Column(nullable = false, name = "reg_time")
     private LocalDateTime regTime;
 
     @Column(nullable = false, columnDefinition = "int default 0")

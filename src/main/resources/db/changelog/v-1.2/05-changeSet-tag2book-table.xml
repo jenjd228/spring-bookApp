@@ -11,6 +11,16 @@
                 <constraints primaryKey="true"/>
             </column>
         </createTable>
+        <addForeignKeyConstraint baseTableName="tag2book"
+                                 baseColumnNames="tag_id"
+                                 constraintName="tag2bookTagConstraint"
+                                 referencedTableName="tag"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="tag2book"
+                                 baseColumnNames="book_id"
+                                 constraintName="tag2bookBookConstraint"
+                                 referencedTableName="book"
+                                 referencedColumnNames="id"/>
         <rollback>
             <dropTable tableName="tag2book"/>
         </rollback>

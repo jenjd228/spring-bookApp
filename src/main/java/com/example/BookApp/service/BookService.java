@@ -1,10 +1,10 @@
 package com.example.BookApp.service;
 
-import com.example.BookApp.dto.BookDTO;
-import com.example.BookApp.dto.BookInitDTO;
-import com.example.BookApp.dto.FromToDateDTO;
+import com.example.BookApp.dto.*;
 import com.example.BookApp.model.*;
 import com.example.BookApp.repository.*;
+import liquibase.pro.packaged.B;
+import net.minidev.json.JSONObject;
 import org.apache.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -12,8 +12,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class BookService {
@@ -32,27 +33,41 @@ public class BookService {
 
     private final BookId2RatingRepository bookId2RatingRepository;
 
+    private final Book2UserRepository book2UserRepository;
+
     private final BookId2RatingValueRepository bookId2RatingValueRepository;
 
     private final BookPopularityRepository bookPopularityRepository;
+
+    private final UserRepository userRepository;
 
     @Qualifier("modelMapperToBookInitDTO")
     private final ModelMapper modelMapperToBookInitDTO;
 
     @Qualifier("modelMapperToBookIdAndRating")
     private final ModelMapper modelMapperToBookIdAndRating;
+    
+    @Qualifier("modelMapperToBookSlugDTO")
+    private final ModelMapper modelMapperToBookSlugDTO;
 
-    BookService(BookId2RatingRepository bookId2RatingRepository,ModelMapper modelMapperToBookIdAndRating, BookId2RatingValueRepository bookId2RatingValueRepository, Book2GenreRepository book2GenreRepository, GenreRepository genreRepository, BookPopularityRepository bookPopularityRepository, ModelMapper modelMapperToBookInitDTO, BooksRepository booksRepository, AuthorRepository authorRepository, Book2AuthorRepository book2AuthorRepository) {
+    @Qualifier("modelMapperToPostponedBooksDTO")
+    private final ModelMapper modelMapperToPostponedBooksDTO;
+
+    BookService(UserRepository userRepository,ModelMapper modelMapperToPostponedBooksDTO,Book2UserRepository book2UserRepository,ModelMapper modelMapperToBookSlugDTO,BookId2RatingRepository bookId2RatingRepository,ModelMapper modelMapperToBookIdAndRating, BookId2RatingValueRepository bookId2RatingValueRepository, Book2GenreRepository book2GenreRepository, GenreRepository genreRepository, BookPopularityRepository bookPopularityRepository, ModelMapper modelMapperToBookInitDTO, BooksRepository booksRepository, AuthorRepository authorRepository, Book2AuthorRepository book2AuthorRepository) {
         this.book2GenreRepository = book2GenreRepository;
         this.genreRepository = genreRepository;
         this.bookPopularityRepository = bookPopularityRepository;
         this.modelMapperToBookInitDTO = modelMapperToBookInitDTO;
         this.modelMapperToBookIdAndRating = modelMapperToBookIdAndRating;
+        this.modelMapperToBookSlugDTO = modelMapperToBookSlugDTO;
         this.booksRepository = booksRepository;
         this.authorRepository = authorRepository;
         this.book2AuthorRepository = book2AuthorRepository;
         this.bookId2RatingValueRepository = bookId2RatingValueRepository;
         this.bookId2RatingRepository = bookId2RatingRepository;
+        this.book2UserRepository = book2UserRepository;
+        this.modelMapperToPostponedBooksDTO = modelMapperToPostponedBooksDTO;
+        this.userRepository = userRepository;
     }
 
     public void book2GenreInit() {
@@ -228,21 +243,21 @@ public class BookService {
     public ArrayList<BookInitDTO> getAllBooks() {
         logger.info("getBooks");
         List<BookInit> booksInit = booksRepository.findAllBooks();
-        List<BookInitDTO> list = booksInit.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        List<BookInitDTO> list = booksInit.stream().map(this::convertToBookInitDTO).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
         return new ArrayList<>(list);
     }
 
     public BookDTO getRecommendedBooks(Integer offset, Integer limit) {
         Pageable pageable = PageRequest.of(offset, limit);
         List<BookInit> booksInit = booksRepository.findAll(pageable);
-        List<BookInitDTO> list = booksInit.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        List<BookInitDTO> list = booksInit.stream().map(this::convertToBookInitDTO).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
         return new BookDTO(booksRepository.getBookCount(), list);
     }
 
     public BookDTO getRecentBooks(Integer offset, Integer limit, FromToDateDTO fromToDateDTO) {
         Pageable pageable = PageRequest.of(offset, limit);
         List<BookInit> booksInit;
-        Integer bookCount = 0;
+        Integer bookCount;
 
         if (fromToDateDTO.getFrom() == null && fromToDateDTO.getTo() == null) {
             booksInit = booksRepository.findRecentBooks(pageable);
@@ -255,45 +270,69 @@ public class BookService {
             bookCount = booksRepository.getCountRecentBooksWhereFromIsNotNull(fromToDateDTO.getFrom());
         }
 
-        List<BookInitDTO> list = booksInit.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        List<BookInitDTO> list = booksInit.stream().map(this::convertToBookInitDTO).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
         return new BookDTO(bookCount, list);
     }
 
     public BookDTO getPopularBooks(Integer offset, Integer limit) {
         Pageable pageable = PageRequest.of(offset, limit);
         List<BookInit> booksInit = booksRepository.findPopularBooks(pageable);
-        List<BookInitDTO> list = booksInit.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        List<BookInitDTO> list = booksInit.stream().map(this::convertToBookInitDTO).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
         return new BookDTO(booksRepository.getBookCount(), list);
     }
 
     public BookDTO getBooksByAuthorId(Integer offset, Integer limit, Integer id) {
         Pageable pageable = PageRequest.of(offset, limit);
         List<BookInit> booksInit = booksRepository.findBooksByAuthorId(pageable, id);
-        List<BookInitDTO> list = booksInit.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        List<BookInitDTO> list = booksInit.stream().map(this::convertToBookInitDTO).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
         return new BookDTO(booksRepository.getCountBooksByAuthorId(id), list);
     }
 
     public BookDTO getBooksByGenreId(Integer offset, Integer limit, Integer genreId) {
         Pageable pageable = PageRequest.of(offset, limit);
         List<BookInit> booksInit = booksRepository.findBooksByGenreId(pageable, genreId);
-        List<BookInitDTO> list = booksInit.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        List<BookInitDTO> list = booksInit.stream().map(this::convertToBookInitDTO).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
         return new BookDTO(booksRepository.getCountBooksByGenreId(genreId), list);
     }
 
     public BookDTO getBookByTagId(Integer offset, Integer limit,Integer tagId){
         Pageable pageable = PageRequest.of(offset, limit);
         List<BookInit> booksInit = booksRepository.findBooksByTagId(pageable, tagId);
-        List<BookInitDTO> list = booksInit.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        List<BookInitDTO> list = booksInit.stream().map(this::convertToBookInitDTO).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
         return new BookDTO(booksRepository.getCountBooksByTagId(tagId), list);
     }
 
     public BookDTO getBooksByQuery(String query) {
-        List<BookInit> booksInit = booksRepository.getBooksByTitleContaining(query);
-        List<BookInitDTO> list = booksInit.stream().map(this::convertToDto).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        List<BookInit> booksInit = booksRepository.findBooksByTitleContaining(query);
+        List<BookInitDTO> list = booksInit.stream().map(this::convertToBookInitDTO).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
         return new BookDTO(list.size(), list);
     }
 
-    private BookInitDTO convertToDto(BookInit bookInit) {
+    public BookSlugDTO getBookSlugById(Integer id){
+        Optional<Book> book = booksRepository.findById(id);
+        if (book.isPresent()){
+            BookSlugDTO bookSlugDTO = modelMapperToBookSlugDTO.map(book.get(),BookSlugDTO.class);
+            for (CommentDTO commentDTO : bookSlugDTO.getComments()){
+                BookId2RatingValue bookId2RatingValue = bookId2RatingValueRepository.findBookId2RatingValueByBookIdAndUserId(
+                        commentDTO.getUser().getId(),commentDTO.getId());
+                int rating = 0;
+                if (bookId2RatingValue != null){
+                    rating = bookId2RatingValue.getValue();
+                }
+                commentDTO.setUserRating(rating);
+            }
+            bookSlugDTO.setCommentsCount(bookSlugDTO.getComments().size());
+            System.out.println(bookSlugDTO);
+            return bookSlugDTO;
+        }
+        return new BookSlugDTO();
+    }
+
+    private BookSlugDTO convertToBookSlugDTO(BookSlug bookSlug){
+        return bookSlug == null ? null : modelMapperToBookSlugDTO.map(bookSlug,BookSlugDTO.class);
+    }
+
+    private BookInitDTO convertToBookInitDTO(BookInit bookInit) {
         return bookInit == null ? null : modelMapperToBookInitDTO.map(bookInit, BookInitDTO.class);
     }
 
@@ -301,4 +340,75 @@ public class BookService {
         return bookIdAndRatingInterface == null ? null : modelMapperToBookIdAndRating.map(bookIdAndRatingInterface, BookIdAndRating.class);
     }
 
+    private PostponedBooksDTO convertToPostponedBooksDTO(PostponedBooksInterface postponedBooksInterface) {
+        return postponedBooksInterface == null ? null : modelMapperToBookIdAndRating.map(postponedBooksInterface, PostponedBooksDTO.class);
+    }
+
+    public PostponedBooksAndIdsDTO getPostponedBooks(int userId) {
+        List<PostponedBooksInterface> list = book2UserRepository.findPostponedBooks(userId);
+        List<PostponedBooksDTO> list2 = list.stream().map(this::convertToPostponedBooksDTO)
+                .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        List<Integer> listIds = list2.stream().map(PostponedBooksDTO::getBookId).collect(Collectors.toList());
+        return new PostponedBooksAndIdsDTO(list2,listIds);
+    }
+
+    public JSONObject changeBookStatus(List<Integer> booksIds, String status,Integer userId) {
+        JSONObject json = new JSONObject();
+        boolean result = true;
+        int typeId = getBookType(status);
+
+        for(Integer bookId : booksIds){
+            Book2User book2User = book2UserRepository.findBookByBookIdAndUserId(userId,bookId);
+            if (book2User != null){
+                if (status.equals("UNLINK")){
+                    book2UserRepository.delete(book2User);
+                }else {
+                    if (typeId != book2User.getTypeId()){
+                        if (book2User.getTypeId() == 2 && typeId == 1){
+                            result = false;
+                            json.put("error","Нельзя отложить купленную книгу");
+                        }else {
+                            book2User.setTypeId(typeId);
+                            book2UserRepository.save(book2User);
+                        }
+                    }
+                }
+            }else {
+                Optional<User> user = userRepository.findById(userId);
+                if (user.isPresent()){
+                    book2UserRepository.save(getNewBook2User(typeId,userId,bookId));
+                    result = true;
+                }else {
+                    result = false;
+                    break;
+                }
+            }
+        }
+        json.put("result",result);
+        return json;
+    }
+
+    private Integer getBookType(String status){
+        switch (status){
+            case "CART" -> {
+                return 2;
+            }
+            case "KEPT" -> {
+                return 1;
+            }
+            case "ARCHIVED" -> {
+                return 4;
+            }
+        }
+        return 0;
+    }
+
+    private Book2User getNewBook2User(Integer typeId,Integer userId, Integer bookId) {
+        Book2User book2User = new Book2User();
+        book2User.setBookId(bookId);
+        book2User.setUserId(userId);
+        book2User.setTypeId(typeId);
+        book2User.setTime(LocalDateTime.now());
+        return book2User;
+    }
 }
