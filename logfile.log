@@ -1,3 +1,12 @@
-2021-06-30 12:46:04 INFO  com.example.BookApp.controllers.DefaultController     - index
-2021-06-30 12:46:27 INFO  com.example.BookApp.controllers.DefaultController     - /books/slug/38
-2021-06-30 12:46:47 INFO  com.example.BookApp.controllers.DefaultController     - /books/slug/48
+2021-07-01 20:06:55 INFO  com.example.BookApp.controllers.DefaultController     - /books/recommended0 6
+2021-07-01 20:06:55 INFO  com.example.BookApp.controllers.DefaultController     - /books/popular 1 6
+2021-07-01 20:06:55 INFO  com.example.BookApp.controllers.DefaultController     - /books/recent 0 6 null
+2021-07-01 20:06:56 INFO  com.example.BookApp.controllers.DefaultController     - index
+2021-07-01 20:06:58 INFO  com.example.BookApp.controllers.DefaultController     - /books/slug/3
+2021-07-01 20:07:00 INFO  com.example.BookApp.controllers.DefaultController     - /books/slug/4
+2021-07-01 20:07:06 INFO  com.example.BookApp.controllers.DefaultController     - /books/slug/1
+2021-07-01 20:07:09 INFO  com.example.BookApp.controllers.DefaultController     - /books/slug/5
+2021-07-01 20:07:13 INFO  com.example.BookApp.controllers.DefaultController     - /books/slug/43
+2021-07-01 20:07:17 INFO  com.example.BookApp.controllers.DefaultController     - /books/slug/2
+2021-07-01 20:07:20 INFO  com.example.BookApp.controllers.DefaultController     - /books/slug/48
+2021-07-01 20:07:33 INFO  com.example.BookApp.controllers.DefaultController     - /postponed

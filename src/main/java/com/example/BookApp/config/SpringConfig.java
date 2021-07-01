@@ -8,6 +8,7 @@ import org.modelmapper.PropertyMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -43,12 +44,14 @@ public class SpringConfig {
                     .map(x-> new AuthorOnlyNameAndIdDTO(x.getId(), x.getName()))
                     .collect(Collectors.toSet()));
 
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+
             bookSlugDTO.setComments(book.getComments()
                     .stream()
                     .map(comment -> new CommentDTO(comment.getBookId(),new UserOnlyNameAndIdDTO(comment.getUserId(),
                                                             comment.getUser().getName()),
                                                     comment.getText(),
-                                                    comment.getTime(),0,
+                                                    comment.getTime().format(formatter),0,
                                                     comment.getLikeCount(),
                                                     comment.getDislikeCount()))
                     .collect(Collectors.toSet()));

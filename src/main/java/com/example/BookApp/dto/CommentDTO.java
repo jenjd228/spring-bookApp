@@ -17,7 +17,7 @@ public class CommentDTO {
 
     private String text;
 
-    private LocalDateTime time;
+    private String time;
 
     private int userRating;
 
